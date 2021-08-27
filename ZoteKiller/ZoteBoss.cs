@@ -19,7 +19,9 @@ namespace ZoteKiller
         private void Hm_OnDeath()
         {
             ZoteData zoteData = ZoteKillerMod.zoteData;
-            GameObject czo = transform.Find("Corpse Zote Ordeal First(Clone)").gameObject;
+            GameObject czo = Instantiate(ZoteKillerMod.zoteCor);
+            czo.transform.parent = transform;
+            czo.transform.position = transform.position;
             czo.SetActive(true);
             czo.LocateMyFSM("Control").InsertMethod("End", 0, () =>
             {

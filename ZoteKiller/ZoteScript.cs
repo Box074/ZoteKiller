@@ -12,7 +12,8 @@ namespace ZoteKiller
 
         void OnCollisionEnter2D(Collision2D collision)
         {
-            if(collision.gameObject.layer == (int)GlobalEnums.PhysLayers.HERO_ATTACK)
+            if(collision.otherCollider.gameObject.layer == (int)GlobalEnums.PhysLayers.HERO_ATTACK
+                || collision.collider.gameObject.layer == (int)GlobalEnums.PhysLayers.HERO_ATTACK)
             {
                 GameObject boss = Instantiate(ZoteKillerMod.zoteBoss);
                 boss.transform.position = transform.position;

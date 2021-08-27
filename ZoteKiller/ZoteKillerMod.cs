@@ -14,12 +14,14 @@ namespace ZoteKiller
     public class ZoteKillerMod : Mod , ILocalSettings<ZoteData>
     {
         public static GameObject zoteBoss = null;
+        public static GameObject zoteCor = null;
         public static GameObject zoteDead = null;
         public override List<(string, string)> GetPreloadNames()
         {
             return new List<(string, string)>
             {
                 ("GG_Mighty_Zote","Battle Control/First Zote/Zote Boss"),
+                ("GG_Mighty_Zote","Corpse Zote Ordeal First"),
                 ("Fungus1_20_v02","Zote Death")
             };
         }
@@ -31,9 +33,10 @@ namespace ZoteKiller
             PlayMakerFSM zbC = zoteBoss.LocateMyFSM("Control");
             zbC.ChangeTransition("Roar?", "FINISHED", "Idle");
             zbC.ChangeTransition("Init", "FINISHED", "Trip?");
-            GameObject czo = zoteBoss.transform.Find("Corpse Zote Ordeal First(Clone)").gameObject;
-            UnityEngine.Object.Destroy(czo.transform.Find("white_solid"));
-            PlayMakerFSM czoc = czo.LocateMyFSM("Control");
+
+            zoteCor = preloadedObjects["GG_Mighty_Zote"]["Corpse Zote Ordeal First"];
+            UnityEngine.Object.Destroy(zoteCor.transform.Find("white_solid"));
+            PlayMakerFSM czoc = zoteCor.LocateMyFSM("Control");
             czoc.ChangeTransition("Burst", "FINISHED", "End");
             #endregion
             #region Zote Dead
