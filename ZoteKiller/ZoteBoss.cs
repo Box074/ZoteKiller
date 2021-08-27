@@ -6,6 +6,7 @@ namespace ZoteKiller
 {
     public class ZoteBoss : MonoBehaviour
     {
+        public static ZoteKillerMod ZoteKillerMod => (ZoteKillerMod)Modding.ModHooks.GetMod("ZoteKillerMod");
         void Awake()
         {
             DamageHero dh = GetComponent<DamageHero>();
@@ -13,6 +14,8 @@ namespace ZoteKiller
             foreach (var v in GetComponentsInChildren<DamageHero>()) Destroy(v);
 
             HealthManager hm = GetComponent<HealthManager>();
+            hm.IsInvincible = false;
+            hm.isDead = false;
             hm.OnDeath += Hm_OnDeath;
         }
 
@@ -25,6 +28,7 @@ namespace ZoteKiller
             czo.SetActive(true);
             czo.LocateMyFSM("Control").InsertMethod("End", 0, () =>
             {
+                for (int i = 0; i < transform.childCount; i++) Destroy(transform.GetChild(i).gameObject);
                 GameObject d = Instantiate(ZoteKillerMod.zoteDead);
                 d.transform.position = transform.position;
                 d.SetActive(true);

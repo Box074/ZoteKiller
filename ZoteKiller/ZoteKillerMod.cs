@@ -35,7 +35,7 @@ namespace ZoteKiller
             zbC.ChangeTransition("Init", "FINISHED", "Trip?");
 
             zoteCor = preloadedObjects["GG_Mighty_Zote"]["Corpse Zote Ordeal First"];
-            UnityEngine.Object.Destroy(zoteCor.transform.Find("white_solid"));
+            UnityEngine.Object.Destroy(zoteCor.transform.Find("white_solid").gameObject);
             PlayMakerFSM czoc = zoteCor.LocateMyFSM("Control");
             czoc.ChangeTransition("Burst", "FINISHED", "End");
             #endregion
@@ -92,11 +92,6 @@ namespace ZoteKiller
                 if (arg1.name == "Fungus1_20_v02")
                 {
                     ModHooks.HeroUpdateHook += FindZoteConv;
-                }
-                else if (arg1.name == "Town")
-                {
-                    arg1.FindGameObject("Zote Dead")?.AddComponent<ZoteScript>();
-                    arg1.FindGameObject("Zote Town")?.AddComponent<ZoteScript>();
                 }
                 else
                 {

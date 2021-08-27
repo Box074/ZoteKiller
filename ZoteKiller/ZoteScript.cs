@@ -12,15 +12,21 @@ namespace ZoteKiller
 
         void OnCollisionEnter2D(Collision2D collision)
         {
-            if(collision.otherCollider.gameObject.layer == (int)GlobalEnums.PhysLayers.HERO_ATTACK
-                || collision.collider.gameObject.layer == (int)GlobalEnums.PhysLayers.HERO_ATTACK)
+            if(collision.otherCollider.gameObject.tag.IndexOf("attack",System.StringComparison.OrdinalIgnoreCase) != -1
+                || collision.collider.gameObject.tag.IndexOf("attack", System.StringComparison.OrdinalIgnoreCase) != -1)
             {
-                GameObject boss = Instantiate(ZoteKillerMod.zoteBoss);
-                boss.transform.position = transform.position;
-                boss.SetActive(true);
-                boss.AddComponent<ZoteBoss>();
-                Destroy(gameObject);
+                Tran();
             }
+        }
+        void OnCollisionStay2D(Collision2D collision) => OnCollisionEnter2D(collision);
+
+        public void Tran()
+        {
+            GameObject boss = Instantiate(ZoteKillerMod.zoteBoss);
+            boss.transform.position = transform.position;
+            boss.SetActive(true);
+            boss.AddComponent<ZoteBoss>();
+            Destroy(gameObject);
         }
     }
 }
