@@ -30,23 +30,42 @@ namespace ZoteKiller
             #region ZoteBoss
             zoteBoss = preloadedObjects["GG_Mighty_Zote"]["Battle Control/First Zote/Zote Boss"];
             zoteBoss.SetActive(false);
+            UnityEngine.Object.Destroy(zoteBoss.GetComponent<NonBouncer>());
             PlayMakerFSM zbC = zoteBoss.LocateMyFSM("Control");
             zbC.ChangeTransition("Roar?", "FINISHED", "Idle");
             zbC.ChangeTransition("Init", "FINISHED", "Trip?");
 
             zoteCor = preloadedObjects["GG_Mighty_Zote"]["Corpse Zote Ordeal First"];
             UnityEngine.Object.Destroy(zoteCor.transform.Find("white_solid").gameObject);
-            PlayMakerFSM czoc = zoteCor.LocateMyFSM("Control");
-            czoc.ChangeTransition("Burst", "FINISHED", "End");
+            foreach (var v in zoteCor.GetComponents<PlayMakerFSM>()) UnityEngine.Object.Destroy(v);
+            zoteCor.AddComponent<ZoteCor>();
             #endregion
             #region Zote Dead
             zoteDead = preloadedObjects["Fungus1_20_v02"]["Zote Death"];
+            zoteDead.name = "Zote Dead(M)";
             zoteDead.SetActive(false);
             foreach (var v in zoteDead.GetComponents<PlayMakerFSM>()) UnityEngine.Object.Destroy(v);
             #endregion
 
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
+            On.HutongGames.PlayMaker.Actions.SendEventByName.OnEnter += SendEventByName_OnEnter;
         }
+
+        private void SendEventByName_OnEnter(On.HutongGames.PlayMaker.Actions.SendEventByName.orig_OnEnter orig,
+            HutongGames.PlayMaker.Actions.SendEventByName self)
+        {
+            if(self.Fsm.FsmComponent.gameObject.name.IndexOf("Corpse Zote Ordeal First") != -1 &&
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "GG_Mighty_Zote")
+            {
+                UnityEngine.Object.Destroy(self.Fsm.FsmComponent.gameObject);
+                self.Fsm.ActiveState.Actions = new HutongGames.PlayMaker.FsmStateAction[0];
+            }
+            else
+            {
+                orig(self);
+            }
+        }
+
         private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
         {
             if (zoteData == null) return;
@@ -55,7 +74,7 @@ namespace ZoteKiller
             {
                 if (arg1.name == "Fungus1_20_v02")
                 {
-                    arg1.FindGameObject("Zote Dead")?.SetActive(false);
+                    GameObject.Find("Zote Dead")?.SetActive(false);
                 }
                 if (arg1.name == "Town")
                 {
@@ -63,7 +82,7 @@ namespace ZoteKiller
                     {
                         PlayerData.instance.zoteDead = false;
                         PlayerData.instance.zoteDefeated = true;
-                        arg1.FindGameObject("Zote Final")?.SetActive(false);
+                        GameObject.Find("Zote Final")?.SetActive(false);
                     }
                     else
                     {
@@ -92,6 +111,10 @@ namespace ZoteKiller
                 if (arg1.name == "Fungus1_20_v02")
                 {
                     ModHooks.HeroUpdateHook += FindZoteConv;
+                }
+                else if(arg1.name == "Town")
+                {
+                    GameObject.Find("Zote Final")?.AddComponent<ZoteScript>();
                 }
                 else
                 {
@@ -126,11 +149,6 @@ namespace ZoteKiller
             zoteData = s;
         }
 
-        public ZoteData OnSaveLocal()
-        {
-            ZoteData r = zoteData;
-            zoteData = null;
-            return r;
-        }
+        public ZoteData OnSaveLocal() => zoteData;
     }
 }

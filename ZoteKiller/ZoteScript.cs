@@ -1,24 +1,26 @@
 ﻿using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace ZoteKiller
 {
     public class ZoteScript : MonoBehaviour
     {
-        void Awake()
-        {
-            gameObject.layer = (int)GlobalEnums.PhysLayers.ENEMIES;
-        }
 
-        void OnCollisionEnter2D(Collision2D collision)
+        void FixedUpdate()
         {
-            if(collision.otherCollider.gameObject.tag.IndexOf("attack",System.StringComparison.OrdinalIgnoreCase) != -1
-                || collision.collider.gameObject.tag.IndexOf("attack", System.StringComparison.OrdinalIgnoreCase) != -1)
+            Collider2D[] r = Physics2D.OverlapPointAll(transform.position);
+            if(
+                r.Any(
+                    x => x.gameObject.layer == (int)GlobalEnums.PhysLayers.HERO_ATTACK ||
+                        x.gameObject.tag == "Nail Attack"
+                )
+                )
             {
+                
                 Tran();
             }
         }
-        void OnCollisionStay2D(Collision2D collision) => OnCollisionEnter2D(collision);
 
         public void Tran()
         {

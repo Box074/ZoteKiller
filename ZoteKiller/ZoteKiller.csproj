@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ZoteBoss.cs" />
+    <Compile Include="ZoteCor.cs" />
     <Compile Include="ZoteData.cs" />
     <Compile Include="ZoteKillerMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
