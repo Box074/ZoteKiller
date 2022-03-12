@@ -3,6 +3,8 @@
 namespace ZoteKiller;
 public class ZoteCor : MonoBehaviour
 {
+    public bool controlHero;
+    public Action onEnd;
     void Start()
     {
         StartCoroutine(StartAnim());
@@ -11,6 +13,13 @@ public class ZoteCor : MonoBehaviour
 
     IEnumerator StartAnim()
     {
+        if(controlHero)
+        {
+            HeroController.instance.RelinquishControl();
+            HeroController.instance.StopAnimationControl();
+            HeroController.instance.GetComponent<tk2dSpriteAnimator>().Play("Idle");
+            HeroController.instance.AffectedByGravity(true);
+        }
         Rigidbody2D rig = GetComponent<Rigidbody2D>();
         gameObject.layer = (int)GlobalEnums.PhysLayers.ENEMIES;
         rig.bodyType = RigidbodyType2D.Dynamic;
@@ -50,9 +59,9 @@ public class ZoteCor : MonoBehaviour
         d.SetActive(true);
 
         zoteData.KilledZote = true;
-        zoteData.DeadScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        zoteData.DeadX = d.transform.position.x;
-        zoteData.DeadY = d.transform.position.y;
+        zoteData.DeathScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        zoteData.DeathX = d.transform.position.x;
+        zoteData.DeathY = d.transform.position.y;
 
         if (PlayerData.instance.brettaRescued && PlayerData.instance.zoteDefeated)
         {
@@ -63,5 +72,11 @@ public class ZoteCor : MonoBehaviour
             PlayerData.instance.zoteDefeated = false;
             PlayerData.instance.zoteDead = true;
         }
+        if(controlHero)
+        {
+            HeroController.instance.RegainControl();
+            HeroController.instance.StartAnimationControl();
+        }
+        onEnd?.Invoke();
     }
 }

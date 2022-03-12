@@ -21,7 +21,7 @@ public class ZoteKillerMod : ModBaseWithSettings<ZoteKillerMod, object, ZoteData
         zoteBoss.SetActive(false);
         UnityEngine.Object.Destroy(zoteBoss.GetComponent<NonBouncer>());
         PlayMakerFSM zbC = zoteBoss.LocateMyFSM("Control");
-        using(var patch = zbC.Fsm.CreatePatch())
+        using (var patch = zbC.Fsm.CreatePatch())
         {
             patch.EditState("Roar?")
                 .ChangeTransition("FINISHED", "Idle")
@@ -92,11 +92,10 @@ public class ZoteKillerMod : ModBaseWithSettings<ZoteKillerMod, object, ZoteData
                 PlayerData.instance.zoteSpokenCity = false;
                 PlayerData.instance.zoteSpokenColosseum = false;
             }
-            if (arg1.name == zoteData.DeadScene)
+            if (arg1.name == zoteData.DeathScene && !zoteData.DeathInColosseum)
             {
-
                 GameObject dead = UnityEngine.Object.Instantiate(zoteDead);
-                dead.transform.position = new Vector2(zoteData.DeadX, zoteData.DeadY);
+                dead.transform.position = new Vector2(zoteData.DeathX, zoteData.DeathY);
                 dead.SetActive(true);
             }
         }
@@ -113,7 +112,7 @@ public class ZoteKillerMod : ModBaseWithSettings<ZoteKillerMod, object, ZoteData
             }
             else
             {
-                foreach(var v in arg1.ForEachGameObjects())
+                foreach (var v in arg1.ForEachGameObjects())
                 {
                     if (v.name.IndexOf("zote", StringComparison.OrdinalIgnoreCase) != -1 && v.LocateMyFSM("npc_control") != null)
                     {
@@ -122,6 +121,32 @@ public class ZoteKillerMod : ModBaseWithSettings<ZoteKillerMod, object, ZoteData
                 }
             }
         }
+    }
+    [FsmPatcher("Room_Colosseum_Bronze", "Colosseum Manager", "Battle")]
+    private static void PatchBattleControl(FSMPatch patch)
+    {
+        patch.EditState("Wave 28");
+        if(zoteData.KilledZote)
+        {
+            patch.ChangeTransition("WAVE END", "Final Reset");
+        }
+    }
+
+    [FsmPatcher("Room_Colosseum_Bronze", "Corpse Zote Boss(Clone)", "Control")]
+    private static void PatchZoteInColosseum(FSMPatch patch)
+    {
+        var go = patch.TargetFSM.FsmComponent.gameObject;
+        var czo = UnityEngine.Object.Instantiate(ZoteKillerMod.zoteCor);
+        var cor = czo.GetComponent<ZoteCor>();
+        cor.controlHero = true;
+        cor.onEnd += () =>
+        {
+            PlayMakerFSM.BroadcastEvent("WAVE END");
+            zoteData.DeathInColosseum = true;
+        };
+        czo.transform.position = go.transform.position;
+        czo.SetActive(true);
+        UnityEngine.Object.Destroy(go);
     }
 
     private void FindZoteConv()
