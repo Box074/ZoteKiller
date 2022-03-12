@@ -1,0 +1,13 @@
+{
+  "ProjectName": "ZoteKiller",
+  "ModVersion": "0.0.0.0",
+  "CodeDir": ".\\Scripts\\",
+  "EmbeddedResourceDir": ".\\EmbeddedResource\\",
+  "EmbeddedResource": {},
+  "Guid": "5b0f408e-1764-4119-9082-87544be5e305",
+  "DependenciesDir": ".\\Dependencies\\",
+  "ModdingAPIVersion": "1.5.78.11833-68",
+  "IgnoreDlls": [],
+  "WebDependencies": [],
+  "UseGZip": true
+}
