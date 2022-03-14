@@ -10,5 +10,6 @@ global using UnityEngine;
 global using UnityEngine.SceneManagement;
 
 global using HKTool;
+global using HKTool.Attributes;
 global using HKTool.FSM;
 global using HKTool.Utils;

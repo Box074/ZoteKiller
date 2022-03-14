@@ -5,19 +5,11 @@ public class ZoteKillerMod : ModBaseWithSettings<ZoteKillerMod, object, ZoteData
     public static GameObject zoteBoss = null;
     public static GameObject zoteCor = null;
     public static GameObject zoteDead = null;
-    public override List<(string, string)> GetPreloadNames()
+
+    [Preload("GG_Mighty_Zote", "Battle Control/First Zote/Zote Boss")]
+    private void PrelaodZoteBoss(GameObject go)
     {
-        return new List<(string, string)>
-            {
-                ("GG_Mighty_Zote","Battle Control/First Zote/Zote Boss"),
-                ("GG_Mighty_Zote","Corpse Zote Ordeal First"),
-                ("Fungus1_20_v02","Zote Death")
-            };
-    }
-    public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
-    {
-        #region ZoteBoss
-        zoteBoss = preloadedObjects["GG_Mighty_Zote"]["Battle Control/First Zote/Zote Boss"];
+        zoteBoss = go;
         zoteBoss.SetActive(false);
         UnityEngine.Object.Destroy(zoteBoss.GetComponent<NonBouncer>());
         PlayMakerFSM zbC = zoteBoss.LocateMyFSM("Control");
@@ -28,19 +20,25 @@ public class ZoteKillerMod : ModBaseWithSettings<ZoteKillerMod, object, ZoteData
                 .EditState("Init")
                 .ChangeTransition("FINISHED", "Trip?");
         }
-
-        zoteCor = preloadedObjects["GG_Mighty_Zote"]["Corpse Zote Ordeal First"];
+    }
+    [Preload("GG_Mighty_Zote", "Corpse Zote Ordeal First")]
+    private void PreloadCorpseZote(GameObject go)
+    {
+        zoteCor = go;
         UnityEngine.Object.Destroy(zoteCor.transform.Find("white_solid").gameObject);
         foreach (var v in zoteCor.GetComponents<PlayMakerFSM>()) UnityEngine.Object.Destroy(v);
         zoteCor.AddComponent<ZoteCor>();
-        #endregion
-        #region Zote Dead
-        zoteDead = preloadedObjects["Fungus1_20_v02"]["Zote Death"];
+    }
+    [Preload("Fungus1_20_v02", "Zote Death")]
+    private void PreloadZoteDeath(GameObject go)
+    {
+        zoteDead = go;
         zoteDead.name = "Zote Dead(M)";
         zoteDead.SetActive(false);
         foreach (var v in zoteDead.GetComponents<PlayMakerFSM>()) UnityEngine.Object.Destroy(v);
-        #endregion
-
+    }
+    public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
+    {
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
         On.HutongGames.PlayMaker.Actions.SendEventByName.OnEnter += SendEventByName_OnEnter;
     }
@@ -126,7 +124,7 @@ public class ZoteKillerMod : ModBaseWithSettings<ZoteKillerMod, object, ZoteData
     private static void PatchBattleControl(FSMPatch patch)
     {
         patch.EditState("Wave 28");
-        if(zoteData.KilledZote)
+        if (zoteData.KilledZote)
         {
             patch.ChangeTransition("WAVE END", "Final Reset");
         }
